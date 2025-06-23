@@ -1,0 +1,9 @@
+[[commands]]
+package = "go"
+
+[[commands]]
+package = "gotest"
+
+[[commands]]
+name = "make"
+package = "gnumake"
