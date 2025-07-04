@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/netip"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/maeshinshin/mdns"
+	"github.com/maeshinshin/mdns/example/util"
 )
 
 var debug = flag.Bool("debug", false, "Enable debug mode")
@@ -26,9 +26,16 @@ func main() {
 	}
 	m.Start()
 	defer m.Shutdown()
+
+	ip, err := util.GetOutboundIP()
+	if err != nil {
+		fmt.Println("Error getting outbound IP:", err)
+		return
+	}
+
 	m.Register(&mdns.Service{
 		Hostname: "example.local.",
-		IP:       ptr(netip.MustParseAddr("192.168.1.1")),
+		IP:       ip,
 	})
 
 	sig := make(chan os.Signal, 1)
@@ -37,8 +44,4 @@ func main() {
 	fmt.Println("mDNS server running. Press Ctrl+C to exit.")
 	<-sig
 	m.Shutdown()
-}
-
-func ptr[T any](v T) *T {
-	return &v
 }
