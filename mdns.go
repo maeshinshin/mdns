@@ -117,7 +117,7 @@ func (s *Server) handleQuery(packet []byte, from *net.UDPAddr) {
 		return
 	}
 
-	logger.Debug("Received query from %s for: %v", from.String(), questions)
+	logger.Debug(fmt.Sprintf("Received query from %s for: %v", from.String(), questions))
 	var answers []dnsmessage.Resource
 	s.mu.Lock()
 	for _, q := range questions {
