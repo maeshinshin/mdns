@@ -190,49 +190,12 @@ func (s *Server) run() {
 				}
 			}
 			s.mu.Unlock()
-			s.announce()
 
 		case <-s.shutdown:
 			logger.Info("Stopping mDNS operational loop")
 			s.conn.Close()
 			return
 		}
-	}
-}
-
-func (s *Server) announce() {
-	if len(s.records) == 0 {
-		return
-	}
-	records := make([]dnsmessage.Resource, 0, len(s.records))
-	for _, record := range s.records {
-		if record.Header.TTL > 0 {
-			records = append(records, *record)
-		}
-	}
-
-	if len(records) == 0 {
-		return
-	}
-
-	msg := dnsmessage.Message{
-		Header: dnsmessage.Header{
-			Response:      true,
-			Authoritative: true,
-		},
-		Answers: records,
-	}
-
-	packed, err := msg.Pack()
-	if err != nil {
-		logger.Error("Failed to pack DNS message", "error", err)
-		return
-	}
-
-	logger.Debug("Sending mDNS announcement", "count", len(records), "to", s.destAddr.String())
-	_, err = s.conn.WriteToUDP(packed, s.destAddr)
-	if err != nil {
-		logger.Error("Ensure the mDNS service is running and the network is configured correctly")
 	}
 }
 
